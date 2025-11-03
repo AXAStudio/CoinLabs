@@ -1,4 +1,0 @@
-"""
-Market Service
-"""
-
