@@ -1,16 +1,27 @@
-from fastapi import APIRouter
-from app.models.crypto import Crypto
+from fastapi import APIRouter, HTTPException
+from app.models.crypto import Crypto, CryptoCreate
 from app.services.crypto import (
     add_crypto, list_cryptos, get_crypto, update_price, delete_crypto
 )
 
 router = APIRouter(prefix="/crypto", tags=["Crypto"])
 
-@router.post("/add")
-def api_add_crypto(data: Crypto):
-    result = add_crypto(data)
+@router.post("/add", response_model=Crypto)
+def api_add_crypto(data: CryptoCreate):
+    crypto = Crypto(
+        symbol=data.symbol,
+        price=data.price,
+        volume=data.volume,
+        initial_price=data.price,
+        history=[],
+        order_book={}
+    )
+
+    result = add_crypto(crypto)
+
     if not result:
-        return {"error": "Crypto already exists"}
+        raise HTTPException(status_code=400, detail="Crypto already exists")
+
     return result
 
 @router.get("/list")

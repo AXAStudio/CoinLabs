@@ -7,3 +7,9 @@ class Crypto(BaseModel):
     history: list[float] = []
     initial_price: float = 0
     order_book: dict = {}
+
+class CryptoCreate(BaseModel):
+    symbol: str
+    price: float
+    volume: float
+

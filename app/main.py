@@ -8,5 +8,4 @@ app = FastAPI(default_response_class=ORJSONResponse)
 
 app.include_router(crypto_router)
 
-
 start_simulation()

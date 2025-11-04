@@ -13,7 +13,7 @@ def add_crypto(data: Crypto):
         return None
 
     data.symbol = symbol
-    data.initial_price = data.price
+    data._initial_price = data.price
     data.order_book = create_order_book(data.price)
     data.history = [data.price]
 
