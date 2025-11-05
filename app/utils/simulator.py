@@ -12,6 +12,7 @@ _step = 0
 
 def _t_noise(df=cfg.DF_T, size=None):
     z = np.random.standard_t(df, size=size)
+    
     return z / np.sqrt(df / (df - 2.0))
 
 def _tick_size_for_price(p):
@@ -26,13 +27,13 @@ def _round_tick(x, tick):
     return np.round(x / tick) * tick
 
 def _is_stablecoin(symbol: str):
-    s = symbol.upper()
-    return any(k in s for k in cfg.STABLECOIN_TOKENS)
+    return any(k in symbol.upper() for k in cfg.STABLECOIN_TOKENS)
 
 def _intraday_seasonality(step):
     period = int((24 * 60 * 60) / cfg.TICK_SPEED)
     if period <= 0:
         return 1.0
+    
     phase = 2 * np.pi * (step % period) / period
     return 1.0 + cfg.SEASONAL_AMP * np.sin(phase)
 
