@@ -30,3 +30,5 @@ SENTI_CLIP = 0.02
 SEASONAL_AMP = 0.07
 
 STABLECOIN_TOKENS = ("USDT", "USDC", "DAI", "TUSD", "FDUSD", "USDP")
+
+GRANULARITY_LEVELS = ["1s", "5s", "1m", "30m", "1h", "90m", "1d", "5d", "1wk", "1mo", "3mo", "6mo", "1y", "5y", "10y"]

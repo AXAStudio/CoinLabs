@@ -12,7 +12,7 @@ _step = 0
 
 def _t_noise(df=cfg.DF_T, size=None):
     z = np.random.standard_t(df, size=size)
-    
+
     return z / np.sqrt(df / (df - 2.0))
 
 def _tick_size_for_price(p):
