@@ -5,6 +5,7 @@ import { Loader2, AlertCircle, TrendingUp, DollarSign, Activity, LineChart as Li
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { formatNumber } from '@/lib/utils';
 
 export default function MarketOverview() {
   const pollingRate = parseInt(localStorage.getItem('pollingRate') || '1000');
@@ -130,10 +131,7 @@ export default function MarketOverview() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-2xl font-bold text-foreground">${currentValue.toLocaleString('en-US', {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}</p>
+                  <p className="text-2xl font-bold text-foreground">${formatNumber(currentValue)}</p>
                 </CardContent>
               </Card>
 
@@ -146,10 +144,7 @@ export default function MarketOverview() {
                 </CardHeader>
                 <CardContent>
                   <p className={`text-2xl font-bold ${totalChange >= 0 ? 'text-success' : 'text-destructive'}`}>
-                    {totalChange >= 0 ? '+' : ''}{totalChange.toLocaleString('en-US', {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}%
+                    {totalChange >= 0 ? '+' : ''}{totalChange.toFixed(2)}%
                   </p>
                 </CardContent>
               </Card>
@@ -162,10 +157,7 @@ export default function MarketOverview() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-2xl font-bold text-foreground">${maxValue.toLocaleString('en-US', {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}</p>
+                  <p className="text-2xl font-bold text-foreground">${formatNumber(maxValue)}</p>
                 </CardContent>
               </Card>
 
@@ -177,10 +169,7 @@ export default function MarketOverview() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-2xl font-bold text-foreground">${minValue.toLocaleString('en-US', {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}</p>
+                  <p className="text-2xl font-bold text-foreground">${formatNumber(minValue)}</p>
                 </CardContent>
               </Card>
             </div>

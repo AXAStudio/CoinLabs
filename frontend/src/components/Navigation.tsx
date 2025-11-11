@@ -1,10 +1,25 @@
-import { LayoutDashboard, Settings, Menu, X, LineChart } from 'lucide-react';
+import { LayoutDashboard, Settings, Menu, X, LineChart, LogOut } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 export const Navigation = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast.error('Failed to logout');
+    } else {
+      localStorage.removeItem('userId');
+      toast.success('Logged out successfully');
+      navigate('/auth');
+    }
+  };
 
   return (
     <nav className="border-b border-primary/20 bg-card/50 backdrop-blur-md sticky top-0 z-50">
@@ -15,7 +30,7 @@ export const Navigation = () => {
           </h1>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex gap-4">
+          <div className="hidden md:flex gap-4 items-center">
             <NavLink
               to="/"
               className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors hover:bg-secondary"
@@ -40,6 +55,15 @@ export const Navigation = () => {
               <Settings className="h-5 w-5" />
               Settings
             </NavLink>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleLogout}
+              className="flex items-center gap-2"
+            >
+              <LogOut className="h-4 w-4" />
+              Logout
+            </Button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -83,6 +107,17 @@ export const Navigation = () => {
               <Settings className="h-5 w-5" />
               Settings
             </NavLink>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setMobileMenuOpen(false);
+                handleLogout();
+              }}
+              className="flex items-center gap-2 w-full justify-start px-4 py-3"
+            >
+              <LogOut className="h-5 w-5" />
+              Logout
+            </Button>
           </div>
         )}
       </div>

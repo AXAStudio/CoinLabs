@@ -6,6 +6,7 @@ import { CryptoDetailDialog } from '@/components/CryptoDetailDialog';
 import { useCryptoData, Crypto } from '@/hooks/useCryptoData';
 import { Loader2, AlertCircle, TrendingUp, DollarSign, Wallet } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { formatNumber } from '@/lib/utils';
 
 export default function Dashboard() {
   const pollingRate = parseInt(localStorage.getItem('pollingRate') || '1000');
@@ -59,10 +60,7 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 <p className="text-3xl sm:text-4xl font-bold text-foreground mb-1">
-                  ${startingValue.toLocaleString('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
+                  ${formatNumber(startingValue)}
                 </p>
                 <p className="text-xs text-muted-foreground">Initial investment</p>
               </CardContent>
@@ -79,12 +77,9 @@ export default function Dashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                  <p className="text-3xl sm:text-4xl font-bold text-foreground mb-1">
-                    ${totalValue.toLocaleString('en-US', {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                  </p>
+                <p className="text-3xl sm:text-4xl font-bold text-foreground mb-1">
+                  ${formatNumber(totalValue)}
+                </p>
                 <p className="text-xs text-muted-foreground">Current portfolio value</p>
               </CardContent>
             </Card>
@@ -104,10 +99,7 @@ export default function Dashboard() {
                   {allTimeReturn >= 0 ? '+' : ''}{allTimeReturn.toFixed(2)}%
                 </p>
                 <p className={`text-sm font-medium ${allTimeReturn >= 0 ? 'text-success/80' : 'text-destructive/80'}`}>
-                  {allTimeReturn >= 0 ? '+' : ''}${(totalValue - startingValue).toLocaleString('en-US', {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
+                  {allTimeReturn >= 0 ? '+' : ''}${formatNumber(totalValue - startingValue)}
                 </p>
               </CardContent>
             </Card>

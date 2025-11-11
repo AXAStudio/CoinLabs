@@ -23,13 +23,32 @@ export const useCryptoData = (apiUrl: string, pollingRate: number): UseCryptoDat
 
   const fetchCryptos = useCallback(async () => {
     try {
-      const response = await fetch(`${apiUrl}/list`);
-      if (!response.ok) throw new Error('Failed to fetch crypto data');
-      const data = await response.json();
-      setCryptos(data);
-      setError(null);
+      // Get user ID from localStorage (set after login)
+      const userId = localStorage.getItem('userId');
+      if (!userId) {
+        setError('User not authenticated');
+        setCryptos([]);
+        setLoading(false);
+        return;
+      }
+
+      const response = await fetch(`${apiUrl}/portfolio?user_id=${userId}`);
+      if (!response.ok) {
+        // If portfolio is empty or doesn't exist, set empty array
+        if (response.status === 400) {
+          setCryptos([]);
+          setError(null);
+        } else {
+          throw new Error('Failed to fetch portfolio data');
+        }
+      } else {
+        const data = await response.json();
+        setCryptos(Array.isArray(data) ? data : []);
+        setError(null);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
+      setCryptos([]);
     } finally {
       setLoading(false);
     }

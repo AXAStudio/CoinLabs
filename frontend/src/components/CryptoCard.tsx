@@ -15,6 +15,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Crypto } from '@/hooks/useCryptoData';
+import { formatNumber } from '@/lib/utils';
 
 interface CryptoCardProps {
   crypto: Crypto;
@@ -58,21 +59,25 @@ export const CryptoCard = ({ crypto, apiUrl, onDelete, onClick }: CryptoCardProp
   const handleDelete = async () => {
     setDeleting(true);
     try {
-      const response = await fetch(`${apiUrl}/${encodeURIComponent(crypto.symbol)}`, {
+      const response = await fetch(`${apiUrl}/delete`, {
         method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ symbol: crypto.symbol }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to delete cryptocurrency');
+        throw new Error('Failed to remove cryptocurrency from portfolio');
       }
 
-      toast.success('Cryptocurrency deleted', {
-        description: `${crypto.symbol} has been removed`,
+      toast.success('Removed from portfolio', {
+        description: `${crypto.symbol} has been removed from your portfolio`,
       });
 
       onDelete();
     } catch (error) {
-      toast.error('Failed to delete', {
+      toast.error('Failed to remove', {
         description: error instanceof Error ? error.message : 'Unknown error',
       });
     } finally {
@@ -95,21 +100,15 @@ export const CryptoCard = ({ crypto, apiUrl, onDelete, onClick }: CryptoCardProp
               <div>
                 <h3 className="text-xl sm:text-2xl font-bold text-foreground group-hover:text-gradient transition-all duration-300">{crypto.symbol}</h3>
                 <p className="text-xs text-muted-foreground/70">
-                  Vol: {crypto.volume.toLocaleString()}
+                  Vol: {formatNumber(crypto.volume, 0)}
                 </p>
               </div>
             </div>
             <p className={`text-3xl sm:text-4xl font-bold ${getPriceColor()} transition-colors duration-300 mb-1`}>
-                ${crypto.price.toLocaleString('en-US', {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
+              ${formatNumber(crypto.price)}
             </p>
             <p className="text-xs sm:text-sm text-muted-foreground/70">
-              Initial: ${crypto.initial_price.toLocaleString('en-US', {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
+              Initial: ${formatNumber(crypto.initial_price)}
             </p>
           </div>
           <div className="flex items-center gap-4 sm:gap-5 w-full sm:w-auto">
@@ -122,10 +121,7 @@ export const CryptoCard = ({ crypto, apiUrl, onDelete, onClick }: CryptoCardProp
                   ? 'bg-success/10 text-success border border-success/20' 
                   : 'bg-destructive/10 text-destructive border border-destructive/20'
               }`}>
-                {changePercent >= 0 ? '↑' : '↓'} {Math.abs(crypto.price - crypto.initial_price).toLocaleString('en-US', {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
+                {changePercent >= 0 ? '↑' : '↓'} ${formatNumber(Math.abs(crypto.price - crypto.initial_price))}
               </div>
             </div>
             <AlertDialog>
@@ -141,9 +137,9 @@ export const CryptoCard = ({ crypto, apiUrl, onDelete, onClick }: CryptoCardProp
               </AlertDialogTrigger>
             <AlertDialogContent className="bg-card border-border">
               <AlertDialogHeader>
-                <AlertDialogTitle>Delete {crypto.symbol}?</AlertDialogTitle>
+                <AlertDialogTitle>Remove {crypto.symbol} from Portfolio?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This action cannot be undone. This will permanently remove {crypto.symbol} from your dashboard.
+                  This will remove {crypto.symbol} from your portfolio. You can add it back later if needed.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -152,7 +148,7 @@ export const CryptoCard = ({ crypto, apiUrl, onDelete, onClick }: CryptoCardProp
                   onClick={handleDelete}
                   className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
                 >
-                  Delete
+                  Remove from Portfolio
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>

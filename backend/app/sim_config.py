@@ -1,3 +1,5 @@
+import os
+
 TICK_SPEED = 0.5
 HISTORY_LIMIT = 500
 
@@ -32,3 +34,46 @@ SEASONAL_AMP = 0.07
 STABLECOIN_TOKENS = ("USDT", "USDC", "DAI", "TUSD", "FDUSD", "USDP")
 
 GRANULARITY_LEVELS = ["1s", "5s", "1m", "30m", "1h", "90m", "1d", "5d", "1wk", "1mo", "3mo", "6mo", "1y", "5y", "10y"]
+
+
+class DBSchema:
+    """
+    Database Schema
+    """
+    def __init__(self):
+        self.CRYPTO_EXCHANGE = "cryptoexchange"
+
+class Config:
+    """
+    Uniform Configs
+    """
+    def __init__(self):
+        self.SUPABASE_URL = os.getenv("SUPABASE_URL")
+        self.SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+        self.SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
+        self.DB_SCHEMA = DBSchema()
+        self.LOGGER = 'uvicorn.error'
+
+class DevConfig(Config):
+    """
+    Development Configs
+    """
+    DEBUG = True
+    def __init__(self):
+        from dotenv import load_dotenv
+        load_dotenv()
+
+        super().__init__()
+
+class ProdConfig(Config):
+    """
+    Production Configs
+    """
+    DEBUG = False
+
+
+# Setup API Config
+if os.getenv("ENV") == "PROD":
+    config = ProdConfig()
+else:
+    config = DevConfig()

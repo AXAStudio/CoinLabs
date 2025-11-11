@@ -9,6 +9,7 @@ import {
 import { TrendingUp, TrendingDown, DollarSign, Activity, BookOpen } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LineChart, Line, Area, AreaChart, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
+import { formatNumber } from '@/lib/utils';
 
 interface CryptoDetailDialogProps {
   crypto: Crypto | null;
@@ -63,7 +64,7 @@ export const CryptoDetailDialog = ({ crypto, open, onOpenChange }: CryptoDetailD
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <p className="text-xs sm:text-sm text-muted-foreground mb-1">Current Price</p>
-                  <p className="text-2xl sm:text-3xl font-bold text-foreground">${crypto.price.toFixed(2)}</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-foreground">${formatNumber(crypto.price)}</p>
                 </div>
                 <div>
                   <p className="text-xs sm:text-sm text-muted-foreground mb-1">Change</p>
@@ -80,11 +81,11 @@ export const CryptoDetailDialog = ({ crypto, open, onOpenChange }: CryptoDetailD
                 </div>
                 <div>
                   <p className="text-xs sm:text-sm text-muted-foreground mb-1">Initial Price</p>
-                  <p className="text-lg sm:text-xl font-semibold text-foreground">${crypto.initial_price.toFixed(2)}</p>
+                  <p className="text-lg sm:text-xl font-semibold text-foreground">${formatNumber(crypto.initial_price)}</p>
                 </div>
                 <div>
                   <p className="text-xs sm:text-sm text-muted-foreground mb-1">Volume</p>
-                  <p className="text-lg sm:text-xl font-semibold text-foreground">{crypto.volume.toLocaleString()}</p>
+                  <p className="text-lg sm:text-xl font-semibold text-foreground">{formatNumber(crypto.volume, 0)}</p>
                 </div>
               </div>
             </CardContent>

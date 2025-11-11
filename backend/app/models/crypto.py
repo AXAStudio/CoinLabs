@@ -13,3 +13,6 @@ class CryptoCreate(BaseModel):
     price: float
     volume: float
 
+class CryptoPortfolioAdd(BaseModel):
+    user_id: str
+    name: str
