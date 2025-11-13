@@ -9,7 +9,7 @@ import { formatNumber } from '@/lib/utils';
 
 export default function MarketOverview() {
   const pollingRate = parseInt(localStorage.getItem('pollingRate') || '1000');
-  const apiUrl = localStorage.getItem('apiUrl') || 'http://localhost:8000/crypto';
+  const apiUrl = localStorage.getItem('apiUrl') || 'http://localhost:8000';
   const { cryptos, loading, error } = useCryptoData(apiUrl, pollingRate);
   const [viewMode, setViewMode] = useState<'combined' | 'individual'>('combined');
 

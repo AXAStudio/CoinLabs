@@ -1,78 +1,47 @@
+"""Compatibility wrapper - re-export market and portfolio services under
+the older `services.crypto` module names so existing imports keep working.
 """
-Exchange Service
-"""
-
-from app.utils.db import cryptos
-from app.models.crypto import Crypto, CryptoPortfolioAdd
-from app.utils.simulator import create_order_book
-from supabase import create_client
-from app.sim_config import config
-
-supabase = create_client(
-    config.SUPABASE_URL,
-    config.SUPABASE_SERVICE_KEY
+from app.services.market import (
+    market_add_crypto,
+    market_get_crypto,
+    market_list_cryptos,
+    market_update_price,
+    market_delete_crypto,
+)
+from app.services.portfolio import (
+    portfolio_add_crypto,
+    portfolio_delete_crypto,
+    portfolio_get_user_cryptos,
 )
 
-def add_crypto(data: Crypto):
-    symbol = data.symbol.upper()
 
-    if symbol in cryptos:
-        return None
+def add_crypto(data):
+    return market_add_crypto(data)
 
-    data.symbol = symbol
-    # store the initial price on the public field expected by the Pydantic model
-    data.initial_price = data.price
-    data.order_book = create_order_book(data.price)
-    data.history = [data.price]
-
-    cryptos[symbol] = data
-    return data
-
-def add_crypto_to_portfolio_service(user_id: str, data: CryptoPortfolioAdd):
-    crypto = get_crypto(data.name)
-    if not crypto:
-        return None
-
-    # access attribute on the Crypto object rather than dict-style indexing
-    initial_price = getattr(crypto, 'initial_price', None)
-    if not initial_price:
-        return None
-
-    new_crypto = {
-        "user_id": user_id,
-        "name": data.name,
-        "initial_price": initial_price,
-    }
-
-    res = supabase.table(config.DB_SCHEMA.CRYPTO_EXCHANGE).insert(
-        new_crypto
-    ).execute()
-
-    return res
-
-def delete_crypto_from_portfolio(user_id: str, data: CryptoPortfolioAdd):
-
-    res = supabase.table(config.DB_SCHEMA.CRYPTO_EXCHANGE).delete().eq("user_id", user_id).eq("name", data.name).execute()
-
-    return res
-
-def get_cryptos_from_portfolio_service(user_id: str):
-    res = supabase.table(config.DB_SCHEMA.CRYPTO_EXCHANGE).select("*").eq("user_id", str(user_id)).execute()
-    return res.data
 
 def get_crypto(symbol: str):
-    return cryptos.get(symbol.upper())
+    return market_get_crypto(symbol)
+
 
 def list_cryptos():
-    return list(cryptos.values())
+    return market_list_cryptos()
+
 
 def update_price(symbol: str, price: float):
-    c = get_crypto(symbol)
-    if not c:
-        return None
-    c.price = price
-    c.history.append(price)
-    return c
+    return market_update_price(symbol, price)
+
 
 def delete_crypto(symbol: str):
-    return cryptos.pop(symbol.upper(), None)
+    return market_delete_crypto(symbol)
+
+
+def add_crypto_to_portfolio_service(user_id: str, data):
+    return portfolio_add_crypto(user_id, data)
+
+
+def delete_crypto_from_portfolio(user_id: str, data):
+    return portfolio_delete_crypto(user_id, data)
+
+
+def get_cryptos_from_portfolio_service(user_id: str):
+    return portfolio_get_user_cryptos(user_id)

@@ -1,7 +1,8 @@
 # app/main.py
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
-from app.routers.crypto import router as crypto_router
+from app.routers.market import router as market_router
+from app.routers.portfolio import router as portfolio_router
 from app.utils.simulator import start_simulation
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -16,6 +17,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(crypto_router)
+app.include_router(market_router)
+app.include_router(portfolio_router)
 
 start_simulation()

@@ -9,7 +9,7 @@ import { Save } from 'lucide-react';
 
 export default function Settings() {
   const [pollingRate, setPollingRate] = useState(1000);
-  const [apiUrl, setApiUrl] = useState('http://localhost:8000/crypto');
+  const [apiUrl, setApiUrl] = useState('http://localhost:8000');
 
   useEffect(() => {
     const savedRate = localStorage.getItem('pollingRate');
@@ -59,7 +59,7 @@ export default function Settings() {
                 value={apiUrl}
                 onChange={(e) => setApiUrl(e.target.value)}
                 className="bg-secondary border-border text-sm sm:text-base"
-                placeholder="http://localhost:8000/crypto"
+                placeholder="http://localhost:8000"
               />
               <p className="text-xs sm:text-sm text-muted-foreground">
                 The base URL for your FastAPI backend. Make sure CORS is enabled.

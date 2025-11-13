@@ -59,7 +59,7 @@ export const CryptoCard = ({ crypto, apiUrl, onDelete, onClick }: CryptoCardProp
   const handleDelete = async () => {
     setDeleting(true);
     try {
-      const response = await fetch(`${apiUrl}/delete`, {
+  const response = await fetch(`${apiUrl}/portfolio/delete`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

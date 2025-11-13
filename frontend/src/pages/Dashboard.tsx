@@ -10,7 +10,7 @@ import { formatNumber } from '@/lib/utils';
 
 export default function Dashboard() {
   const pollingRate = parseInt(localStorage.getItem('pollingRate') || '1000');
-  const apiUrl = localStorage.getItem('apiUrl') || 'http://localhost:8000/crypto';
+  const apiUrl = localStorage.getItem('apiUrl') || 'http://localhost:8000';
   const { cryptos, loading, error, refetch } = useCryptoData(apiUrl, pollingRate);
   const [selectedCrypto, setSelectedCrypto] = useState<Crypto | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);

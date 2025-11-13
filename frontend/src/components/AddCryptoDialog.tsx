@@ -63,7 +63,7 @@ export const AddCryptoDialog = ({ apiUrl, onSuccess }: AddCryptoDialogProps) => 
   const fetchAllCryptos = async () => {
     setLoadingCryptos(true);
     try {
-      const response = await fetch(`${apiUrl}/list`);
+    const response = await fetch(`${apiUrl}/market/list`);
       if (!response.ok) throw new Error('Failed to fetch cryptocurrencies');
       const data = await response.json();
       setAllCryptos(data);
@@ -84,7 +84,7 @@ export const AddCryptoDialog = ({ apiUrl, onSuccess }: AddCryptoDialogProps) => 
     setLoading(true);
     try {
       const token = session?.access_token;
-      const response = await fetch(`${apiUrl}/add`, {
+  const response = await fetch(`${apiUrl}/portfolio/add`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -132,7 +132,7 @@ export const AddCryptoDialog = ({ apiUrl, onSuccess }: AddCryptoDialogProps) => 
 
       // Make API call
       const token = session?.access_token;
-      const response = await fetch(`${apiUrl}/add_new_to_portfolio`, {
+  const response = await fetch(`${apiUrl}/portfolio/add_new_to_portfolio`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
