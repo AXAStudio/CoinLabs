@@ -48,7 +48,8 @@ export default function Auth() {
 
       if (error) {
         console.error('Login error:', error);
-        toast.error('Invalid email or password');
+        // Prefer a helpful error message when available
+        toast.error(error?.message || 'Invalid email or password');
       } else {
         toast.success('Welcome back!');
       }

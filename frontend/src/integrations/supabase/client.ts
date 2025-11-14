@@ -2,16 +2,45 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string | undefined;
+const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined;
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-  auth: {
-    storage: localStorage,
-    persistSession: true,
-    autoRefreshToken: true,
-  }
-});
+// If env vars are missing, export a lightweight mock to avoid a hard runtime crash
+let _supabase: ReturnType<typeof createClient> | any;
+
+if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+  // Minimal mock implementing the auth methods used by the app
+  const noop = () => {};
+
+  _supabase = {
+    auth: {
+      onAuthStateChange: (_cb: any) => ({ data: { subscription: { unsubscribe: noop } } }),
+      getSession: async () => ({ data: { session: null } }),
+      // match supabase-js modern API
+      signInWithPassword: async (_: { email: string; password: string }) => ({
+        error: { message: 'Supabase not configured in frontend env. Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY' },
+        data: null,
+      }),
+      signUp: async (_: any) => ({
+        error: { message: 'Supabase not configured in frontend env. Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY' },
+        data: null,
+      }),
+      signOut: async () => ({ error: null }),
+    },
+    // allow table-like calls to fail gracefully if used
+    from: () => ({ select: async () => ({ data: null }), insert: async () => ({ data: null }) }),
+  } as unknown as ReturnType<typeof createClient>;
+} else {
+  _supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+    auth: {
+      storage: localStorage,
+      persistSession: true,
+      autoRefreshToken: true,
+    }
+  });
+}
+
+export const supabase = _supabase;
