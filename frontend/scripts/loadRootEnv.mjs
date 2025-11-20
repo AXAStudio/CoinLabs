@@ -5,12 +5,31 @@ import path from 'path';
 // (by default we allow keys starting with VITE_). This prevents server-only
 // secrets (like SUPABASE_SERVICE_ROLE_KEY) from being written into the frontend
 // bundle by accident.
-const repoRoot = path.resolve(process.cwd(), '..'); // frontend/ -> repo root is parent
+//
+// On Render (and other hosting), this script may not find a .env file because
+// env vars are provided via the hosting platform's dashboard. In that case,
+// we just warn and continue — Vite will use import.meta.env which is populated
+// by the build environment.
+
+// Try to find repo root (.env is typically at repo root, not in frontend/)
+// Walk up the directory tree looking for .env
+let repoRoot = process.cwd();
+let foundEnv = false;
+for (let i = 0; i < 5; i++) {
+  const potentialEnv = path.join(repoRoot, '.env');
+  if (fs.existsSync(potentialEnv)) {
+    foundEnv = true;
+    break;
+  }
+  repoRoot = path.resolve(repoRoot, '..');
+  // Stop if we reach filesystem root
+  if (repoRoot === path.resolve(repoRoot, '..')) break;
+}
+
 const rootEnv = path.join(repoRoot, '.env');
 const targetEnv = path.join(process.cwd(), '.env');
 
-// Allowlist: keys that are safe to expose to the frontend. By default we pick
-// VITE_ prefixed variables. You can add other safe keys here if needed.
+// Allowlist: keys that are safe to expose to the frontend
 const isAllowedKey = (key) => key.startsWith('VITE_');
 
 function parseDotenv(content) {
@@ -33,7 +52,7 @@ function parseDotenv(content) {
 }
 
 try {
-  if (fs.existsSync(rootEnv)) {
+  if (foundEnv && fs.existsSync(rootEnv)) {
     const data = fs.readFileSync(rootEnv, { encoding: 'utf8' });
     const parsed = parseDotenv(data);
 
@@ -56,9 +75,11 @@ try {
       console.log('Wrote frontend-safe variables to frontend/.env');
     }
   } else {
-    console.warn('No .env found at repo root:', rootEnv);
+    // No .env file found — this is normal on Render where env vars come from the dashboard
+    console.log('No .env file found (normal on hosted platforms). Using environment variables from build system.');
   }
 } catch (err) {
-  console.error('Failed to prepare frontend/.env from repo .env:', err);
-  process.exit(1);
+  console.error('Warning: Failed to prepare frontend/.env:', err.message);
+  // Don't exit with error — build can continue, Vite will use platform env vars
 }
+
