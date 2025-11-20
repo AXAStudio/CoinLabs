@@ -20,7 +20,9 @@ export default function Auth() {
 
   // Redirect if already logged in
   useEffect(() => {
+    console.log('[Auth] Auth page mounted/user changed:', { user_exists: !!user });
     if (user) {
+      console.log('[Auth] User detected, redirecting to dashboard');
       navigate('/');
     }
   }, [user, navigate]);
@@ -28,6 +30,8 @@ export default function Auth() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('[Auth] Login attempt:', { email });
+
     if (!email || !password) {
       toast.error('Please enter email and password');
       return;
@@ -41,16 +45,20 @@ export default function Auth() {
     setLoading(true);
     
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      console.log('[Auth] Calling signInWithPassword...');
+      const { error, data } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password: password,
       });
+
+      console.log('[Auth] signInWithPassword response:', { error: error?.message, data_exists: !!data, user_exists: !!data?.user });
 
       if (error) {
         console.error('Login error:', error);
         // Prefer a helpful error message when available
         toast.error(error?.message || 'Invalid email or password');
       } else {
+        console.log('[Auth] Login successful');
         toast.success('Welcome back!');
       }
     } catch (err) {
@@ -64,6 +72,8 @@ export default function Auth() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('[Auth] Signup attempt:', { email, username });
+
     if (!email || !password || !username) {
       toast.error('Please fill in all fields');
       return;
@@ -82,6 +92,7 @@ export default function Auth() {
     setLoading(true);
     
     try {
+      console.log('[Auth] Calling signUp...');
       const { data, error } = await supabase.auth.signUp({
         email: email.trim(),
         password: password,
@@ -93,6 +104,8 @@ export default function Auth() {
         },
       });
 
+      console.log('[Auth] signUp response:', { error: error?.message, data_exists: !!data, user_exists: !!data?.user });
+
       if (error) {
         console.error('Signup error:', error);
         if (error.message.includes('already registered')) {
@@ -101,6 +114,7 @@ export default function Auth() {
           toast.error(error.message);
         }
       } else if (data.user) {
+        console.log('[Auth] Signup successful');
         toast.success('Account created! Welcome to Crypto Portfolio Tracker!');
       }
     } catch (err) {

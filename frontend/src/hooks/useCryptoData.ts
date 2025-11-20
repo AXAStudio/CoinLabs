@@ -32,7 +32,7 @@ export const useCryptoData = (apiUrl: string, pollingRate: number): UseCryptoDat
         return;
       }
 
-      const response = await fetch(`${apiUrl}/portfolio?user_id=${userId}`);
+      const response = await fetch(`${apiUrl}/crypto/portfolio?user_id=${userId}`);
       if (!response.ok) {
         // If portfolio is empty or doesn't exist, set empty array
         if (response.status === 400) {

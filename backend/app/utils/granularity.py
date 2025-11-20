@@ -37,22 +37,6 @@ def _granularity_to_seconds(g: str) -> int:
 
 
 def get_history_for_granularity(history, granularity: str):
-    """Aggregate a price history list into buckets for the requested granularity.
-
-    - history: list of numeric prices (oldest first).
-    - granularity: one of the strings in `cfg.GRANULARITY_LEVELS` (e.g. '1s', '1m', '1h').
-
-    Counting rule: each tick corresponds to 1 second.
-
-    Returns a list of dicts (oldest first) with keys:
-      - start_index: index of the first tick in the bucket (0-based, relative to input history)
-      - open, high, low, close: aggregated OHLC prices for the bucket
-      - count: number of ticks in the bucket
-      - bucket_size_seconds: number of seconds represented by the bucket
-
-    If the history length is not a multiple of the bucket size, the final (oldest) bucket
-    may be smaller.
-    """
     if granularity not in cfg.GRANULARITY_LEVELS:
         raise ValueError(f"granularity '{granularity}' not supported; allowed: {cfg.GRANULARITY_LEVELS}")
 

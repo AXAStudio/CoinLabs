@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request, Query
 from app.models.crypto import CryptoCreate, CryptoPortfolioAdd, Crypto
 from app.services.portfolio import (
     portfolio_add_crypto,
@@ -66,7 +66,8 @@ def portfolio_delete(user_id: str, data: CryptoPortfolioAdd, request: Request):
 
     return result
 @router.get("")
-def portfolio_list(user_id: str):
+def portfolio_list(user_id: str = Query(..., description="User ID")):
+    """Get all cryptos in user's portfolio"""
     rows = portfolio_get_user_cryptos(user_id) or []
 
     result = []
@@ -93,5 +94,4 @@ def portfolio_list(user_id: str):
                 'order_book': {},
             })
 
-    return result
     return result

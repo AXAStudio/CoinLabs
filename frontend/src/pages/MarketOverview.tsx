@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { formatNumber } from '@/lib/utils';
+import colorForKey from '@/lib/colors';
 
 export default function MarketOverview() {
   const pollingRate = parseInt(localStorage.getItem('pollingRate') || '1000');
@@ -66,16 +67,7 @@ export default function MarketOverview() {
     return history;
   }, [cryptos]);
 
-  const colors = [
-    'hsl(var(--primary))',
-    'hsl(var(--accent))',
-    'hsl(var(--success))',
-    'hsl(var(--chart-5))',
-    'hsl(var(--destructive))',
-    'hsl(180, 70%, 45%)',
-    'hsl(290, 70%, 55%)',
-    'hsl(50, 90%, 50%)',
-  ];
+  // colors array left for reference; per-asset colors are generated deterministically
 
   const currentValue = portfolioHistory.length > 0 ? portfolioHistory[portfolioHistory.length - 1].value : 0;
   const initialValue = portfolioHistory.length > 0 ? portfolioHistory[0].initialValue : 0;
@@ -327,18 +319,21 @@ export default function MarketOverview() {
                           wrapperStyle={{ paddingTop: '20px' }}
                           iconType="line"
                         />
-                        {cryptos.map((crypto, index) => (
-                          <Line
-                            key={crypto.symbol}
-                            type="monotone"
-                            dataKey={crypto.symbol}
-                            stroke={colors[index % colors.length]}
-                            strokeWidth={2.5}
-                            dot={false}
-                            name={crypto.symbol}
-                            isAnimationActive={false}
-                          />
-                        ))}
+                        {cryptos.map((crypto, index) => {
+                          const stroke = colorForKey(crypto.symbol, index);
+                          return (
+                            <Line
+                              key={crypto.symbol}
+                              type="monotone"
+                              dataKey={crypto.symbol}
+                              stroke={stroke}
+                              strokeWidth={2.5}
+                              dot={false}
+                              name={crypto.symbol}
+                              isAnimationActive={false}
+                            />
+                          );
+                        })}
                       </LineChart>
                     </ResponsiveContainer>
                   </CardContent>

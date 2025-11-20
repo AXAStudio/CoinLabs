@@ -5,13 +5,23 @@ import type { Database } from './types';
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string | undefined;
 const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined;
 
+// DEBUG: Log env var status on client init
+console.log('[Supabase Client Init]', {
+  VITE_SUPABASE_URL_present: !!SUPABASE_URL,
+  VITE_SUPABASE_PUBLISHABLE_KEY_present: !!SUPABASE_PUBLISHABLE_KEY,
+  env_mode: process.env.NODE_ENV,
+});
+
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
 // If env vars are missing, export a lightweight mock to avoid a hard runtime crash
 let _supabase: ReturnType<typeof createClient> | any;
+let _isMock = false;
 
 if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+  console.warn('[Supabase Client] Using MOCK mode because env vars missing');
+  _isMock = true;
   // Minimal mock implementing the auth methods used by the app
   const noop = () => {};
 
@@ -34,6 +44,8 @@ if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
     from: () => ({ select: async () => ({ data: null }), insert: async () => ({ data: null }) }),
   } as unknown as ReturnType<typeof createClient>;
 } else {
+  console.log('[Supabase Client] Creating REAL client with provided credentials');
+  _isMock = false;
   _supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
     auth: {
       storage: localStorage,
@@ -43,4 +55,5 @@ if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
   });
 }
 
+export { _isMock as isMockMode };
 export const supabase = _supabase;

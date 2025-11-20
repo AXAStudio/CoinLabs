@@ -2,15 +2,15 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
-import { SettingsProvider } from '@/contexts/SettingsContext';
 import Dashboard from "./pages/Dashboard";
 import MarketOverview from "./pages/MarketOverview";
 import Settings from "./pages/Settings";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import { useEffect } from "react";
+import { initThemeFromStorage, applyTheme, getSavedTheme, getSavedAccent, getCurrentApplied } from '@/lib/theme';
 
 const queryClient = new QueryClient();
 
@@ -42,11 +42,13 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-      <SettingsProvider>
       <TooltipProvider>
+        {/* initialize theme from localStorage on app mount */}
+        <InitTheme />
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <ThemeSync />
           <Routes>
             <Route path="/auth" element={<Auth />} />
             <Route
@@ -78,9 +80,37 @@ const App = () => (
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
-      </SettingsProvider>
     </AuthProvider>
   </QueryClientProvider>
 );
+
+function InitTheme() {
+  useEffect(() => {
+    try {
+      initThemeFromStorage();
+    } catch (e) {
+      // ignore
+    }
+  }, []);
+  return null;
+}
+
+function ThemeSync() {
+  // Re-apply theme on every location change to prevent route-specific resets
+  const loc = useLocation();
+  useEffect(() => {
+    try {
+      const t = getSavedTheme();
+      const a = getSavedAccent();
+      const current = getCurrentApplied();
+      // If user has a preview/unsaved selection currently applied, don't override it on route change
+      if (current.theme && (current.theme !== t || current.accent !== a)) {
+        return;
+      }
+      applyTheme(t, a);
+    } catch (e) {}
+  }, [loc.pathname]);
+  return null;
+}
 
 export default App;

@@ -1,4 +1,16 @@
-# app/main.py
+"""app/main.py
+Ensure environment variables from the repo root `.env` are loaded early so the
+backend can use the central .env placed at the repository root.
+"""
+from dotenv import load_dotenv
+import pathlib
+import os
+
+repo_root = pathlib.Path(__file__).resolve().parents[2]
+env_path = repo_root / '.env'
+if env_path.exists():
+    load_dotenv(env_path)
+
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 from app.routers.market import router as market_router
@@ -17,7 +29,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(market_router)
-app.include_router(portfolio_router)
+# Include routers with /crypto prefix so routes are /crypto/market, /crypto/portfolio, etc.
+app.include_router(market_router, prefix="/crypto")
+app.include_router(portfolio_router, prefix="/crypto")
 
 start_simulation()
