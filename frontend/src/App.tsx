@@ -96,7 +96,12 @@ function InitTheme() {
     // that read localStorage.getItem('apiUrl') will work on deployed sites.
     try {
       const envApi = (import.meta.env.VITE_API_BASE_URL as string) || '';
-      const defaultApi = envApi || window.location.origin;
+      let defaultApi = envApi || window.location.origin;
+      // Append /crypto to the base URL if not already present
+      defaultApi = defaultApi.replace(/\/+$/, '');
+      if (!defaultApi.endsWith('/crypto')) {
+        defaultApi = `${defaultApi}/crypto`;
+      }
       if (!localStorage.getItem('apiUrl')) {
         localStorage.setItem('apiUrl', defaultApi);
       }
