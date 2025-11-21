@@ -29,7 +29,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(market_router)
-app.include_router(portfolio_router)
+app.include_router(market_router, prefix="/crypto")
+app.include_router(portfolio_router, prefix="/crypto")
 
 start_simulation()

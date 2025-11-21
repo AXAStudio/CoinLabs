@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import joinApi from '@/lib/api';
 
 export interface Crypto {
   symbol: string;
@@ -32,7 +33,11 @@ export const useCryptoData = (apiUrl: string, pollingRate: number): UseCryptoDat
         return;
       }
 
-      const response = await fetch(`${apiUrl}/crypto/portfolio?user_id=${userId}`);
+  // Build URL without hard-coding /crypto here. The `apiUrl` may already
+  // include the `/crypto` prefix (set via VITE_API_BASE_URL). Use
+  // joinApi to avoid doubling segments.
+  const portfolioUrl = `${joinApi(apiUrl, '/portfolio')}?user_id=${userId}`;
+  const response = await fetch(portfolioUrl);
       if (!response.ok) {
         // If portfolio is empty or doesn't exist, set empty array
         if (response.status === 400) {
