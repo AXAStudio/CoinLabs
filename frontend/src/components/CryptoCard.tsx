@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import { TrendingUp, TrendingDown, Minus, Trash2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -25,6 +26,7 @@ interface CryptoCardProps {
 }
 
 export const CryptoCard = ({ crypto, apiUrl, onDelete, onClick }: CryptoCardProps) => {
+  const { session } = useAuth();
   const [prevPrice, setPrevPrice] = useState(crypto.price);
   const [priceChange, setPriceChange] = useState<'up' | 'down' | 'neutral'>('neutral');
   const [deleting, setDeleting] = useState(false);
@@ -63,8 +65,10 @@ export const CryptoCard = ({ crypto, apiUrl, onDelete, onClick }: CryptoCardProp
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
+          ...(session?.access_token && { 'Authorization': `Bearer ${session.access_token}` }),
         },
-        body: JSON.stringify({ symbol: crypto.symbol }),
+        // backend expects a `name` field in the body
+        body: JSON.stringify({ name: crypto.symbol }),
       });
 
       if (!response.ok) {

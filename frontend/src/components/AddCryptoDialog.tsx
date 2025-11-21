@@ -84,22 +84,30 @@ export const AddCryptoDialog = ({ apiUrl, onSuccess }: AddCryptoDialogProps) => 
     setLoading(true);
     try {
       const token = session?.access_token;
-  const response = await fetch(`${apiUrl}/portfolio/add`, {
+      const response = await fetch(`${apiUrl}/portfolio/add`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           ...(token && { 'Authorization': `Bearer ${token}` }),
         },
-        body: JSON.stringify({ 
-          symbol: crypto.symbol,
-          price: crypto.price,
-          volume: crypto.volume
-        }),
+        // backend expects a payload with `name` (and `user_id` is optional
+        // because it's derived from the request auth). Send only the name.
+        body: JSON.stringify({ name: crypto.symbol }),
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || 'Failed to add to portfolio');
+          const errorData = await response.json().catch(() => null);
+          let msg = 'Failed to add to portfolio';
+          if (errorData) {
+            if (typeof errorData === 'string') msg = errorData;
+            else if ((errorData as any).detail) {
+              const d = (errorData as any).detail;
+              msg = typeof d === 'string' ? d : JSON.stringify(d);
+            } else {
+              msg = JSON.stringify(errorData);
+            }
+          }
+          throw new Error(msg);
       }
 
       toast.success('Added to portfolio', {
@@ -142,8 +150,18 @@ export const AddCryptoDialog = ({ apiUrl, onSuccess }: AddCryptoDialogProps) => 
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || 'Failed to create cryptocurrency');
+          const errorData = await response.json().catch(() => null);
+          let msg = 'Failed to create cryptocurrency';
+          if (errorData) {
+            if (typeof errorData === 'string') msg = errorData;
+            else if ((errorData as any).detail) {
+              const d = (errorData as any).detail;
+              msg = typeof d === 'string' ? d : JSON.stringify(d);
+            } else {
+              msg = JSON.stringify(errorData);
+            }
+          }
+          throw new Error(msg);
       }
 
       toast.success('Created and added to portfolio', {

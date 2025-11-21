@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Optional
 
 class Crypto(BaseModel):
     symbol: str
@@ -14,5 +15,5 @@ class CryptoCreate(BaseModel):
     volume: float
 
 class CryptoPortfolioAdd(BaseModel):
-    user_id: str
+    user_id: Optional[str] = None
     name: str

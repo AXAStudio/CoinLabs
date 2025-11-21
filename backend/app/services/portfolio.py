@@ -35,12 +35,24 @@ def portfolio_add_crypto(user_id: str, data: CryptoPortfolioAdd):
         new_crypto
     ).execute()
 
-    return res
+    # supabase-py returns an object with .data and .error. Normalize the
+    # return value to either the inserted row (dict) or None on error so
+    # callers (and the router) can make a clear decision.
+    if getattr(res, 'error', None):
+        return None
+
+    # res.data is typically a list of inserted rows
+    if getattr(res, 'data', None):
+        return res.data[0]
+
+    return None
 
 
 def portfolio_delete_crypto(user_id: str, data: CryptoPortfolioAdd):
     res = supabase.table(config.DB_SCHEMA.CRYPTO_EXCHANGE).delete().eq("user_id", user_id).eq("name", data.name).execute()
-    return res
+    if getattr(res, 'error', None):
+        return None
+    return res.data
 
 
 def portfolio_get_user_cryptos(user_id: str):

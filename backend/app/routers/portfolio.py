@@ -39,7 +39,8 @@ def portfolio_add_new_crypto(data: CryptoCreate, request: Request):
     result = portfolio_add_crypto(user_id, crypto_add)
 
     if not result:
-        raise HTTPException(status_code=400, detail="Crypto already exists")
+        # If DB insert failed, surface a server error
+        raise HTTPException(status_code=500, detail="Failed to insert portfolio row")
 
     return result
 
@@ -47,10 +48,15 @@ def portfolio_add_new_crypto(data: CryptoCreate, request: Request):
 @router.post("/add")
 def portfolio_add_existing_crypto(data: CryptoPortfolioAdd, request: Request):
     user_id = get_current_user_id(request)
-    result = portfolio_add_crypto(user_id, data)
+    # Ensure the crypto exists in the in-memory market and has an initial price
+    live = market_get_crypto((data.name or '').upper())
+    if not live or not getattr(live, 'initial_price', None):
+        raise HTTPException(status_code=400, detail="Crypto not available in market")
 
+    result = portfolio_add_crypto(user_id, data)
     if not result:
-        raise HTTPException(status_code=400, detail="Crypto already exists")
+        # Likely a DB error
+        raise HTTPException(status_code=500, detail="Failed to add to portfolio")
 
     return result
 
