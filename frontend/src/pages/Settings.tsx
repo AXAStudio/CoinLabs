@@ -6,26 +6,22 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Save } from 'lucide-react';
-import { Switch } from '@/components/ui/switch';
 import { applyTheme, saveTheme, saveAccent, getSavedAccent, Theme } from '@/lib/theme';
 
 export default function Settings() {
+  // API URL removed — always fixed
+  const API_URL = "https://coinlabs.onrender.com";
+
   const [pollingRate, setPollingRate] = useState(1000);
-  const [apiUrl, setApiUrl] = useState('http://localhost:8000');
   const [theme, setTheme] = useState<Theme>('dark');
   const [accent, setAccent] = useState(getSavedAccent());
 
   useEffect(() => {
     const savedRate = localStorage.getItem('pollingRate');
-    const savedUrl = localStorage.getItem('apiUrl');
     const savedTheme = localStorage.getItem('theme');
     const savedAccent = localStorage.getItem('accent');
-    if (savedRate) {
-      setPollingRate(parseInt(savedRate));
-    }
-    if (savedUrl) {
-      setApiUrl(savedUrl);
-    }
+
+    if (savedRate) setPollingRate(parseInt(savedRate));
     if (savedTheme) setTheme(savedTheme as Theme);
     if (savedAccent) setAccent(savedAccent);
   }, []);
@@ -33,16 +29,17 @@ export default function Settings() {
   const handleSave = () => {
     const rate = Math.max(100, pollingRate);
     localStorage.setItem('pollingRate', rate.toString());
-    localStorage.setItem('apiUrl', apiUrl);
-    // persist theme settings
+
     saveTheme(theme);
     saveAccent(accent);
     applyTheme(theme, accent);
+
     setPollingRate(rate);
+
     toast.success('Settings saved successfully', {
-      description: `API URL and polling rate updated`,
+      description: `Theme & polling rate updated`,
     });
-    // Reload to apply new settings
+
     setTimeout(() => window.location.href = '/', 500);
   };
 
@@ -52,17 +49,19 @@ export default function Settings() {
       <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-2xl">
         <div className="mb-6 sm:mb-8">
           <h2 className="text-2xl sm:text-3xl font-bold mb-2">Settings</h2>
-          <p className="text-sm sm:text-base text-muted-foreground">Configure your dashboard preferences</p>
+          <p className="text-sm sm:text-base text-muted-foreground">
+            Configure your dashboard preferences
+          </p>
         </div>
 
         <Card className="gradient-card border-border">
           <CardHeader>
-            <CardTitle>API Configuration</CardTitle>
-            <CardDescription>
-              Adjust how frequently the dashboard fetches new data
-            </CardDescription>
+            <CardTitle>Preferences</CardTitle>
+            <CardDescription>Customize your dashboard experience</CardDescription>
           </CardHeader>
+
           <CardContent className="space-y-6">
+            {/* Theme */}
             <div>
               <CardTitle>Theme</CardTitle>
               <CardDescription>Customize appearance of the dashboard</CardDescription>
@@ -73,25 +72,32 @@ export default function Settings() {
                 <Label className="text-sm sm:text-base">Color Mode</Label>
                 <div className="flex items-center gap-4">
                   <label className="flex items-center gap-2">
-                    <input type="radio" name="theme" value="dark" checked={theme === 'dark'} onChange={() => { setTheme('dark'); applyTheme('dark', accent); }} />
+                    <input type="radio" name="theme" value="dark"
+                      checked={theme === 'dark'}
+                      onChange={() => { setTheme('dark'); applyTheme('dark', accent); }} />
                     <span>Dark</span>
                   </label>
+
                   <label className="flex items-center gap-2">
-                    <input type="radio" name="theme" value="light" checked={theme === 'light'} onChange={() => { setTheme('light'); applyTheme('light', accent); }} />
+                    <input type="radio" name="theme" value="light"
+                      checked={theme === 'light'}
+                      onChange={() => { setTheme('light'); applyTheme('light', accent); }} />
                     <span>Light</span>
                   </label>
+
                   <label className="flex items-center gap-2">
-                    <input type="radio" name="theme" value="system" checked={theme === 'system'} onChange={() => { setTheme('system'); applyTheme('system', accent); }} />
+                    <input type="radio" name="theme" value="system"
+                      checked={theme === 'system'}
+                      onChange={() => { setTheme('system'); applyTheme('system', accent); }} />
                     <span>System</span>
                   </label>
                 </div>
-                <p className="text-xs sm:text-sm text-muted-foreground">Switch between light and dark modes. System follows OS preference.</p>
               </div>
 
+              {/* Accent Colors */}
               <div className="space-y-2">
                 <Label className="text-sm sm:text-base">Accent Color</Label>
                 <div className="flex gap-2 items-center">
-                  {/* Preset swatches */}
                   {[
                     { name: 'Teal', hsl: '180 70% 55%' },
                     { name: 'Purple', hsl: '270 80% 65%' },
@@ -108,39 +114,38 @@ export default function Settings() {
                     />
                   ))}
                 </div>
-                <p className="text-xs sm:text-sm text-muted-foreground">Pick an accent color for highlights and charts.</p>
               </div>
             </div>
 
+            {/* Accent Preview */}
             <div>
               <Label className="text-sm sm:text-base">Preview</Label>
               <div className="mt-2 p-4 rounded-lg glass-card flex items-center justify-between">
                 <div>
                   <div className="text-sm text-muted-foreground">Accent preview</div>
-                  <div className="mt-1 font-semibold text-foreground" style={{ color: `hsl(${accent})` }}>Primary / Accent</div>
+                  <div className="mt-1 font-semibold text-foreground" style={{ color: `hsl(${accent})` }}>
+                    Primary / Accent
+                  </div>
                 </div>
-                <div>
-                  <button onClick={() => { saveTheme(theme); saveAccent(accent); applyTheme(theme, accent); toast.success('Preview applied'); }} className="px-3 py-1 rounded-md border border-border">Apply & Save Preview</button>
-                </div>
+
+                <button
+                  onClick={() => {
+                    saveTheme(theme);
+                    saveAccent(accent);
+                    applyTheme(theme, accent);
+                    toast.success('Preview applied');
+                  }}
+                  className="px-3 py-1 rounded-md border border-border">
+                  Apply & Save Preview
+                </button>
               </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="api-url" className="text-sm sm:text-base">API Base URL</Label>
-              <Input
-                id="api-url"
-                type="text"
-                value={apiUrl}
-                onChange={(e) => setApiUrl(e.target.value)}s
-                className="bg-secondary border-border text-sm sm:text-base"
-                placeholder="https://coinlabs.onrender.com"
-              />
-              <p className="text-xs sm:text-sm text-muted-foreground">
-                The base URL for your FastAPI backend. Make sure CORS is enabled.
-              </p>
-            </div>
 
+            {/* Polling Rate */}
             <div className="space-y-2">
-              <Label htmlFor="polling-rate" className="text-sm sm:text-base">Polling Rate (ms)</Label>
+              <Label htmlFor="polling-rate" className="text-sm sm:text-base">
+                Polling Rate (ms)
+              </Label>
               <Input
                 id="polling-rate"
                 type="number"
@@ -150,9 +155,6 @@ export default function Settings() {
                 onChange={(e) => setPollingRate(parseInt(e.target.value) || 100)}
                 className="bg-secondary border-border text-sm sm:text-base"
               />
-              <p className="text-xs sm:text-sm text-muted-foreground">
-                Minimum: 100ms. Lower values update faster but use more resources.
-              </p>
             </div>
 
             <Button onClick={handleSave} className="w-full bg-primary hover:bg-primary/90">
