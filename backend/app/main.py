@@ -29,8 +29,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routers with /crypto prefix so routes are /crypto/market, /crypto/portfolio, etc.
-app.include_router(market_router, prefix="/crypto")
-app.include_router(portfolio_router, prefix="/crypto")
+app.include_router(market_router)
+app.include_router(portfolio_router)
 
 start_simulation()

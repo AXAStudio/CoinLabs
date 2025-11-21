@@ -91,6 +91,18 @@ function InitTheme() {
     } catch (e) {
       // ignore
     }
+    // Ensure the frontend knows the backend API URL. Prefer a build-time VITE var,
+    // otherwise default to the same origin. Store it in localStorage so pages
+    // that read localStorage.getItem('apiUrl') will work on deployed sites.
+    try {
+      const envApi = (import.meta.env.VITE_API_BASE_URL as string) || '';
+      const defaultApi = envApi || window.location.origin;
+      if (!localStorage.getItem('apiUrl')) {
+        localStorage.setItem('apiUrl', defaultApi);
+      }
+    } catch (e) {
+      // ignore in environments that don't support import.meta
+    }
   }, []);
   return null;
 }
