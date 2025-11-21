@@ -130,9 +130,9 @@ export default function Settings() {
                 id="api-url"
                 type="text"
                 value={apiUrl}
-                onChange={(e) => setApiUrl(e.target.value)}
+                onChange={(e) => setApiUrl(e.target.value)}s
                 className="bg-secondary border-border text-sm sm:text-base"
-                placeholder="http://localhost:8000"
+                placeholder="https://coinlabs.onrender.com"
               />
               <p className="text-xs sm:text-sm text-muted-foreground">
                 The base URL for your FastAPI backend. Make sure CORS is enabled.
