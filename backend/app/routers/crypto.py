@@ -11,7 +11,7 @@ from app.services.crypto import (
 )
 from app.utils.auth import get_current_user_id
 
-router = APIRouter(prefix="/crypto", tags=["Crypto"])
+router = APIRouter(tags=["Crypto"])
 
 @router.post("/add_new", response_model=Crypto)
 def api_add_crypto(data: CryptoCreate):
